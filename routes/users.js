@@ -1,4 +1,4 @@
-onst express = require('express');
+const express = require('express');
 const router = express.Router();
 // const { getUserProfile, updateUserProfile, updateUserPassword } = require('../controllers/userController');
 // const { protect } = require('../middleware/authMiddleware');
