@@ -1,21 +1,28 @@
 const sqlite3 = require("sqlite3").verbose(); // Verbose used for more detailed logs
 require("dotenv").config();
 
-const dbFile = process.env.DATABASE_FILE || "ruinox_escape.db";
+const dbFile = process.env.DATABASE_FILE || "ruinox_escape.db"; // Find database file name
 
+// Creating/connecting to database
 const db = new sqlite3.Database(dbFile, (err) => {
+  // Error handling
   if (err) {
     console.error("Error opening database:", err.message);
   } else {
     console.log("Connected to the SQLite database: ${dbFile}");
-    // Use serialize to ensure table creation happens sequentially
+    /* Using serialize() to ensure table creation and other scheduled queries happen sequentially
+    (i.e. it waits until all previous queries have completed and will not run any other queries while 
+    a close is pending. */
     db.serialize(() => {
+      /* Calling 'db' works due to closure and same-scope definition. Another way (in order to avoid 
+      callback chaining hell) is to run all the following database operations outside using 
+      async+await instead of this current method of using serialize() and executing functions inside 
+      the callback. */
       // Create users table to stores login information
       db.run(`CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                username TEXT NOT NULL UNIQUE COLLATE NOCASE,
-                hashed_password TEXT NOT NULL,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                usr_email TEXT NOT NULL UNIQUE COLLATE NOCASE,
+                usr_password TEXT NOT NULL,
             )`, (err) => {
         if (err) console.error("Error creating users table:", err.message);
         else console.log("Users table checked/created.");
